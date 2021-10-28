@@ -12,6 +12,7 @@ var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
 var httpsAddr = ":8443"
 var httpAddr = ":80"
 
+//redirect http to https
 func redirect(w http.ResponseWriter, req *http.Request) {
     // remove/add not default ports from req.Host
     target := "https://" + req.Host + req.URL.Path 
@@ -35,6 +36,6 @@ func main() {
 	})
 	go http.ListenAndServe(httpAddr, http.HandlerFunc(redirect))
 
-	//run server on port 8443
+	//run server on port 443
 	log.Fatal(http.ListenAndServeTLS(httpsAddr, tlsCertPath, tlsKeyPath, nil))
 }
