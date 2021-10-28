@@ -9,7 +9,7 @@ import (
 
 var tlsCertPath = os.Getenv("TLS_CERT_PATH")
 var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
-var httpsAddr = ":8443"
+var httpsAddr = ":443"
 var httpAddr = ":80"
 
 //redirect http to https
@@ -34,7 +34,12 @@ func main() {
 		}
 		fmt.Fprint(res, "Hello World!")
 	})
-	go http.ListenAndServe(httpAddr, http.HandlerFunc(redirect))
+	go func() {
+		if err := http.ListenAndServe(httpAddr, http.HandlerFunc(redirect)); err != nil {
+			log.Fatalf("http error: %v", err)
+		}
+	}()
+	//go http.ListenAndServe(httpAddr, http.HandlerFunc(redirect))
 
 	//run server on port 443
 	log.Fatal(http.ListenAndServeTLS(httpsAddr, tlsCertPath, tlsKeyPath, nil))
