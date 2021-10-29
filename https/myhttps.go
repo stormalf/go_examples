@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -9,8 +9,14 @@ import (
 
 var tlsCertPath = os.Getenv("TLS_CERT_PATH")
 var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
-var httpsAddr = ":443"
-var httpAddr = ":80"
+var httpsAddr = ":8443"
+var httpAddr = ":8082"
+var tmpl *template.Template
+var login = "login.html"
+
+func init() {
+    tmpl = template.Must(template.ParseFiles("template/"+login))
+}
 
 //redirect http to https
 func redirect(w http.ResponseWriter, req *http.Request) {
@@ -32,7 +38,7 @@ func main() {
 			http.NotFound(res, req) 
 			return
 		}
-		fmt.Fprint(res, "Hello World!")
+		tmpl.ExecuteTemplate(res, login, nil)
 	})
 	go func() {
 		if err := http.ListenAndServe(httpAddr, http.HandlerFunc(redirect)); err != nil {
